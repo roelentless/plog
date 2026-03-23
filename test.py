@@ -110,6 +110,19 @@ class TestPlog(unittest.TestCase):
     def test_no_gitignore_no_error(self):
         run_setup("echo test", self.tmp)
 
+    # ── output.log recreation ─────────────────────────────────────────────────
+
+    def test_output_log_recreated_on_rerun(self):
+        import subprocess
+        plog = os.path.join(os.path.dirname(__file__), "plog")
+        log = os.path.join(self.tmp, "plogs", "echo-first", "output.log")
+        subprocess.run([plog, "echo", "first"], cwd=self.tmp, check=True, capture_output=True)
+        first_size = os.path.getsize(log)
+        subprocess.run([plog, "echo", "first"], cwd=self.tmp, check=True, capture_output=True)
+        second_size = os.path.getsize(log)
+        self.assertEqual(first_size, second_size,
+                         "output.log should be recreated, not appended to")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
