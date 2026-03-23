@@ -2,18 +2,17 @@
 
 Give your LLM eyes on a running process.
 
+A thin wrapper around the `script` command. Merges stdout and stderr into a single log file per command.
+
 ```sh
 plog npm run build
 ```
 
-Creates:
+Writes to `./plogs/npm-run-build/`:
 
-```
-./plogs/npm-run-build/
-  output.log
-  info.json
-```
+**`output.log`** — merged stdout and stderr, exactly as it appeared in the terminal.
 
+**`info.json`**:
 ```json
 {
   "command": "npm run build",
@@ -22,7 +21,7 @@ Creates:
 }
 ```
 
-Your terminal output is unchanged. Repeated runs overwrite the previous log. If `.gitignore` exists, `plogs` is added automatically.
+Your terminal is unchanged. Repeated runs overwrite the previous log. If `.gitignore` exists, `plogs` is added automatically.
 
 ## Install
 
