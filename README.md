@@ -16,8 +16,7 @@ Writes to `./plogs/npm-run-build/`:
 ```json
 {
   "command": "npm run build",
-  "started": "2026-03-23T11:50:42+01:00",
-  "exit_code": 0
+  "started": "2026-03-23T11:50:42+01:00"
 }
 ```
 

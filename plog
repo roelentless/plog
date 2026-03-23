@@ -12,19 +12,10 @@ fi
 jq -n \
     --arg command "$*" \
     --arg started "$(date -Iseconds)" \
-    '{"command": $command, "started": $started, "exit_code": null}' \
+    '{"command": $command, "started": $started}' \
     > "$dir/info.json"
 
 case "$(uname -s)" in
     Darwin) script -q "$dir/output.log" "$@" ;;
     Linux)  script -q -e -c "$(printf '%q ' "$@")" "$dir/output.log" ;;
 esac
-
-exit_code=$?
-
-jq --argjson exit_code "$exit_code" \
-    '. + {"exit_code": $exit_code}' \
-    "$dir/info.json" > "$dir/info.json.tmp"
-mv "$dir/info.json.tmp" "$dir/info.json"
-
-exit $exit_code
