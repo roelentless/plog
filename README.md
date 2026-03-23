@@ -1,6 +1,6 @@
 # plog
 
-Wraps any command and logs its output to `~/.plogs/`.
+Wraps any command and logs its output to `./plogs/` in the current directory.
 
 ## Usage
 
@@ -16,15 +16,17 @@ plog python train.py --epochs 100
 
 ## Log location
 
-Every run creates a directory:
+Each run writes to a directory named after the command:
 
 ```
-~/.plogs/<timestamp>-<command-slug>/
+./plogs/<command-slug>/
 ```
 
-Example: `~/.plogs/20260323T115042-npm-run-build/`
+Example: `./plogs/npm-run-build/`
 
-## Files in each log directory
+Repeated runs of the same command overwrite the previous logs.
+
+## Files
 
 | File | Contents |
 |------|----------|
@@ -48,17 +50,16 @@ Example `info.json`:
 - Fully transparent: stdin, stdout, and stderr all pass through normally
 - Output is written to log files in real time
 - Exit code of the wrapped command is preserved
-
-## Override log location
-
-```
-PLOG_DIR=/var/log/myapp plog ./server
-```
+- If `.gitignore` exists in the current directory, `plogs` is appended to it
 
 ## Install
 
-```
-make install
+```sh
+curl -fsSL https://raw.githubusercontent.com/roelentless/plog/main/install.sh | sh
 ```
 
-Installs to `~/.local/bin/plog`.
+Or from source:
+
+```sh
+make install
+```
