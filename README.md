@@ -1,6 +1,41 @@
 # plog
 
-Wraps any command and logs its output to `./plogs/` in the current directory.
+Wrap any command with `plog` and its output is logged to your project folder — where your LLM can read it.
+
+```sh
+plog npm run build
+plog python train.py --epochs 100
+plog uvicorn app:app --reload
+```
+
+## Why
+
+LLMs working in your project can't see what's running in your terminals. `plog` bridges that gap: every wrapped command leaves a structured log file in `./plogs/` that any agent, Claude, or tool can read directly from the filesystem.
+
+No daemons. No configuration. No sidecars. Just prefix your command.
+
+## What it logs
+
+Each run creates:
+
+```
+./plogs/
+  npm-run-build/
+    output.log    ← full terminal output, stdout and stderr combined
+    info.json     ← command, start time, exit code
+```
+
+```json
+{
+  "command": "npm run build",
+  "started": "2026-03-23T11:50:42+01:00",
+  "exit_code": 0
+}
+```
+
+Repeated runs of the same command overwrite the previous log.
+
+If `.gitignore` exists in the current directory, `plogs` is appended automatically.
 
 ## Install
 
@@ -8,33 +43,14 @@ Wraps any command and logs its output to `./plogs/` in the current directory.
 curl -fsSL https://raw.githubusercontent.com/roelentless/plog/main/install.sh | sh
 ```
 
-## Usage
+Or from source:
 
 ```sh
-plog <command> [args...]
+make install
 ```
-
-```sh
-plog npm run build
-plog make test
-plog python train.py --epochs 100
-```
-
-## Log location
-
-Each run writes to a file named after the command:
-
-```
-./plogs/<command-slug>.log
-```
-
-Example: `./plogs/npm-run-build.log`
-
-Repeated runs overwrite the previous log.
 
 ## Behavior
 
-- Output shows in the terminal exactly as normal
-- stdout and stderr are both captured to the log file
+- Output shows in your terminal exactly as normal
 - Exit code of the wrapped command is preserved
-- If `.gitignore` exists in the current directory, `plogs` is appended to it
+- Works on macOS and Linux
