@@ -2,13 +2,19 @@
 
 Wraps any command and logs its output to `./plogs/` in the current directory.
 
+## Install
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/roelentless/plog/main/install.sh | sh
+```
+
 ## Usage
 
-```
+```sh
 plog <command> [args...]
 ```
 
-```
+```sh
 plog npm run build
 plog make test
 plog python train.py --epochs 100
@@ -16,50 +22,19 @@ plog python train.py --epochs 100
 
 ## Log location
 
-Each run writes to a directory named after the command:
+Each run writes to a file named after the command:
 
 ```
-./plogs/<command-slug>/
+./plogs/<command-slug>.log
 ```
 
-Example: `./plogs/npm-run-build/`
+Example: `./plogs/npm-run-build.log`
 
-Repeated runs of the same command overwrite the previous logs.
-
-## Files
-
-| File | Contents |
-|------|----------|
-| `info.json` | Command, start time, PID, exit code |
-| `stdout.log` | Standard output |
-| `stderr.log` | Standard error |
-
-Example `info.json`:
-
-```json
-{
-  "command": "npm run build",
-  "started": "2026-03-23T11:50:42+01:00",
-  "pid": 12345,
-  "exit_code": 0
-}
-```
+Repeated runs overwrite the previous log.
 
 ## Behavior
 
-- Fully transparent: stdin, stdout, and stderr all pass through normally
-- Output is written to log files in real time
+- Output shows in the terminal exactly as normal
+- stdout and stderr are both captured to the log file
 - Exit code of the wrapped command is preserved
 - If `.gitignore` exists in the current directory, `plogs` is appended to it
-
-## Install
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/roelentless/plog/main/install.sh | sh
-```
-
-Or from source:
-
-```sh
-make install
-```

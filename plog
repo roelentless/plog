@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+slug=$(printf '%s' "$*" | tr -cs 'a-zA-Z0-9' '-' | sed 's/^-*//;s/-*$//' | cut -c1-60)
+dir="plogs/${slug}"
+mkdir -p "$dir"
+
+if [ -f .gitignore ] && ! grep -qx 'plogs' .gitignore; then
+    printf 'plogs\n' >> .gitignore
+fi
+
+jq -n \
+    --arg command "$*" \
+    --arg started "$(date -Iseconds)" \
+    '{"command": $command, "started": $started, "exit_code": null}' \
+    > "$dir/info.json"
+
+case "$(uname -s)" in
+    Darwin) script -q "$dir/output.log" "$@" ;;
+    Linux)  script -q -e -c "$(printf '%q ' "$@")" "$dir/output.log" ;;
+esac
+
+exit_code=$?
+
+jq --argjson exit_code "$exit_code" \
+    '. + {"exit_code": $exit_code}' \
+    "$dir/info.json" > "$dir/info.json.tmp"
+mv "$dir/info.json.tmp" "$dir/info.json"
+
+exit $exit_code
