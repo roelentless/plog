@@ -14,6 +14,8 @@ Example:
 
 Options:
   --list   show captured logs in this directory
+
+Tip: tail -50 plogs/npm-run-build/output.log  (limit output lines)
 EOF
     exit 0
     ;;
