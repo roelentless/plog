@@ -1,8 +1,6 @@
 # plog
 
-Give your LLM eyes on a running process.
-
-A thin wrapper around the `script` command. Merges stdout and stderr into a single log file per command.
+Records stdout and stderr of a command to a file, exactly as it appeared in the terminal. A thin wrapper around `script`.
 
 ```sh
 plog npm run build
@@ -21,6 +19,13 @@ Writes to `./plogs/npm-run-build/`:
 ```
 
 Your terminal is unchanged. Repeated runs overwrite the previous log. If `.gitignore` exists, `plogs` is added automatically.
+
+## Options
+
+```sh
+plog --list   # show captured logs in this directory
+plog -h       # show help
+```
 
 ## Install
 

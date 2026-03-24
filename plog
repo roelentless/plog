@@ -1,6 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+case "${1:-}" in
+  -h|--help)
+    cat <<'EOF'
+plog — record a command's stdout and stderr to a file.
+
+Usage: plog <command> [args...]
+
+Example:
+  plog npm run build
+  → plogs/npm-run-build/output.log  (stdout and stderr merged)
+
+Options:
+  --list   show captured logs in this directory
+EOF
+    exit 0
+    ;;
+  --list)
+    found=0
+    if [ -d plogs ]; then
+      for d in plogs/*/; do
+        [ -f "${d}info.json" ] || continue
+        cmd=$(jq -r '.command' "${d}info.json")
+        started=$(jq -r '.started' "${d}info.json")
+        printf "%s  \"%s\"  %s\n" "${d}output.log" "$cmd" "$started"
+        found=1
+      done
+    fi
+    [ "$found" -eq 0 ] && echo "No plogs yet."
+    exit 0
+    ;;
+esac
+
 slug=$(printf '%s' "$*" | tr -cs 'a-zA-Z0-9' '-' | sed 's/^-*//;s/-*$//' | cut -c1-60)
 dir="plogs/${slug}"
 mkdir -p "$dir"

@@ -3,6 +3,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 
@@ -110,10 +111,57 @@ class TestPlog(unittest.TestCase):
     def test_no_gitignore_no_error(self):
         run_setup("echo test", self.tmp)
 
+    # ── flags: -h / --help / --list ───────────────────────────────────────────
+
+    def _plog(self, *args, **kwargs):
+        plog = os.path.join(os.path.dirname(__file__), "plog")
+        return subprocess.run([plog, *args], cwd=self.tmp,
+                              capture_output=True, text=True, **kwargs)
+
+    def test_help_short_exits_zero(self):
+        self.assertEqual(self._plog("-h").returncode, 0)
+
+    def test_help_long_exits_zero(self):
+        self.assertEqual(self._plog("--help").returncode, 0)
+
+    def test_help_short_shows_usage(self):
+        self.assertIn("Usage:", self._plog("-h").stdout)
+
+    def test_help_long_shows_usage(self):
+        self.assertIn("Usage:", self._plog("--help").stdout)
+
+    def test_help_does_not_create_plogs_dir(self):
+        self._plog("-h")
+        self.assertFalse(os.path.exists(os.path.join(self.tmp, "plogs")))
+
+    def test_list_no_plogs_dir(self):
+        result = self._plog("--list")
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("No plogs yet.", result.stdout)
+
+    def test_list_empty_plogs_dir(self):
+        os.makedirs(os.path.join(self.tmp, "plogs"))
+        result = self._plog("--list")
+        self.assertIn("No plogs yet.", result.stdout)
+
+    def test_list_shows_entries(self):
+        run_setup("npm run build", self.tmp)
+        open(os.path.join(self.tmp, "plogs", "npm-run-build", "output.log"), "w").close()
+        result = self._plog("--list")
+        self.assertIn("plogs/npm-run-build/output.log", result.stdout)
+        self.assertIn("npm run build", result.stdout)
+
+    def test_list_does_not_create_plogs_dir(self):
+        self._plog("--list")
+        self.assertFalse(os.path.exists(os.path.join(self.tmp, "plogs")))
+
+    def test_list_no_plogs_yet_has_no_help_text(self):
+        result = self._plog("--list")
+        self.assertNotIn("Usage:", result.stdout)
+
     # ── output.log recreation ─────────────────────────────────────────────────
 
     def test_output_log_recreated_on_rerun(self):
-        import subprocess
         plog = os.path.join(os.path.dirname(__file__), "plog")
         log = os.path.join(self.tmp, "plogs", "echo-first", "output.log")
         subprocess.run([plog, "echo", "first"], cwd=self.tmp, check=True, capture_output=True)
