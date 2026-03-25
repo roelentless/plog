@@ -16,6 +16,9 @@ Options:
   --list   show captured logs in this directory
 
 Tip: tail -50 plogs/npm-run-build/output.log  (limit output lines)
+
+Note: background processes started by the command will be killed when
+it exits. plog only works correctly with foreground commands.
 EOF
     exit 0
     ;;

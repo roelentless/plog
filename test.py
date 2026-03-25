@@ -161,6 +161,8 @@ class TestPlog(unittest.TestCase):
 
     # ── output.log recreation ─────────────────────────────────────────────────
 
+    # ── output.log recreation ─────────────────────────────────────────────────
+
     def test_output_log_recreated_on_rerun(self):
         plog = os.path.join(os.path.dirname(__file__), "plog")
         log = os.path.join(self.tmp, "plogs", "echo-first", "output.log")
